@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>nSpectrum.Wpf</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <PackageId>nSpectrum.Wpf</PackageId>
+    <Description>Direct3D 11 spectrum analyzer control for WPF, driven by nSpectrum.Core.</Description>
+    <PackageTags>audio;spectrum;analyzer;wpf;direct3d</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Vortice.Direct3D11" />
+    <PackageReference Include="Vortice.DXGI" />
+    <PackageReference Include="Vortice.D3DCompiler" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../nSpectrum.Core/nSpectrum.Core.csproj" />
+    <ProjectReference Include="../nSpectrum.Visuals/nSpectrum.Visuals.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Rendering/Spectrum.hlsl" LogicalName="nSpectrum.Wpf.Spectrum.hlsl" />
+  </ItemGroup>
+</Project>

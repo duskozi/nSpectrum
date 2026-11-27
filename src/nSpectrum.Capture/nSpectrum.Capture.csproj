@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>nSpectrum.Capture</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <Description>WASAPI capture, loopback and signal-generator output for nSpectrum (Windows).</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NAudio.Wasapi" />
+    <PackageReference Include="NAudio.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../nSpectrum.Core/nSpectrum.Core.csproj" />
+  </ItemGroup>
+</Project>

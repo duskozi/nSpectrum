@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>nSpectrum.Visuals</RootNamespace>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsPackable>true</IsPackable>
+    <PackageId>nSpectrum.Visuals</PackageId>
+    <Description>Platform-independent software renderers for nSpectrum's LED spectrum, VU and phase meters. Draws into a BGRA pixel buffer any UI can show.</Description>
+    <PackageTags>audio;meter;vu;spectrum;led;goniometer</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../nSpectrum.Core/nSpectrum.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="nSpectrum.Core.Tests" />
+  </ItemGroup>
+</Project>

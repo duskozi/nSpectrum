@@ -1,0 +1,380 @@
+<Window x:Class="nSpectrum.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ns="clr-namespace:nSpectrum.Wpf;assembly=nSpectrum.Wpf"
+        xmlns:rack="clr-namespace:nSpectrum.App.Rack"
+        Title="nSpectrum" Width="1920" SizeToContent="Height"
+        WindowStyle="None" ResizeMode="CanMinimize" WindowStartupLocation="Manual"
+        Background="#1A1715" UseLayoutRounding="True" SnapsToDevicePixels="True"
+        FontFamily="{StaticResource RackFont}" TextElement.Foreground="{StaticResource RackText}">
+  <!-- The whole app is one hi-fi rack unit docked above the taskbar: an options panel (shown and
+       hidden with the gear button) on top of the analyzer itself. Laid out for 1920 units wide;
+       narrower screens scale it down, wider ones give the spectrum screen the extra room. -->
+  <rack:ScaleToWidth DesignWidth="1920">
+    <Grid x:Name="Cabinet">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="22"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="22"/>
+      </Grid.ColumnDefinitions>
+      <ContentControl Grid.Column="0" Style="{StaticResource RackCheek}" Tag="L"/>
+      <ContentControl Grid.Column="2" Style="{StaticResource RackCheek}" Tag="R"/>
+
+      <StackPanel Grid.Column="1">
+        <!-- Options panel -->
+        <ContentControl x:Name="OptionsPanel" IsEnabled="{Binding OptionsOpen}" Style="{StaticResource RackPlate}" Height="206" Padding="22,22,30,16">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="280*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="470*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="300*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="240*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="380*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="150*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="1" Style="{StaticResource RackGroove}"/>
+            <Border Grid.Column="3" Style="{StaticResource RackGroove}"/>
+            <Border Grid.Column="5" Style="{StaticResource RackGroove}"/>
+            <Border Grid.Column="7" Style="{StaticResource RackGroove}"/>
+            <Border Grid.Column="9" Style="{StaticResource RackGroove}"/>
+
+            <!-- INPUT -->
+            <StackPanel Grid.Column="0" Margin="14,0">
+              <TextBlock Style="{StaticResource RackHeader}" rack:RackProps.Engrave="INPUT"/>
+              <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="SOURCE"/>
+              <ComboBox ItemsSource="{Binding Sources}" SelectedItem="{Binding SelectedSource}" Style="{StaticResource RackSelect}" ToolTip="Capture device, loopback (what you hear) or an internal test signal"/>
+              <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="CHANNEL" Margin="0,12,0,5"/>
+              <ListBox ItemsSource="{Binding Routes}" SelectedItem="{Binding SelectedRoute}" Style="{StaticResource RackSegment}" ToolTip="Channel to analyse: left, right, mid (L+R)/2 or side (L−R)/2"/>
+            </StackPanel>
+
+            <!-- ANALYSIS -->
+            <StackPanel Grid.Column="2" Margin="14,0">
+              <TextBlock Style="{StaticResource RackHeader}" rack:RackProps.Engrave="ANALYSIS"/>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="140"/>
+                  <ColumnDefinition Width="14"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="14"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="12"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="FFT SIZE"/>
+                  <ComboBox ItemsSource="{Binding FftSizes}" SelectedItem="{Binding SelectedFft}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="WINDOW"/>
+                  <ComboBox ItemsSource="{Binding Windows}" SelectedItem="{Binding SelectedWindow}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="4" VerticalAlignment="Bottom">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="WEIGHTING"/>
+                  <ListBox ItemsSource="{Binding Weightings}" SelectedItem="{Binding SelectedWeighting}" Style="{StaticResource RackSegment}" Margin="0,0,0,2"
+                           ToolTip="Frequency weighting (IEC 61672): Z flat, A ear-like, C nearly flat"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="AVERAGING"/>
+                  <ComboBox ItemsSource="{Binding Averagings}" SelectedItem="{Binding SelectedAveraging}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="READING"/>
+                  <ComboBox ItemsSource="{Binding Readings}" SelectedItem="{Binding SelectedReading}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="4" VerticalAlignment="Bottom">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="RATE"/>
+                  <ListBox ItemsSource="{Binding Rates}" SelectedItem="{Binding SelectedRate}" Style="{StaticResource RackSegment}" Margin="0,0,0,2" ToolTip="Spectra per second"/>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+
+            <!-- DISPLAY -->
+            <StackPanel Grid.Column="4" Margin="14,0">
+              <TextBlock Style="{StaticResource RackHeader}" rack:RackProps.Engrave="DISPLAY"/>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="14"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="12"/>
+                  <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="LOOK"/>
+                  <ComboBox ItemsSource="{Binding Looks}" SelectedItem="{Binding SelectedLook}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="BANDS"/>
+                  <ComboBox ItemsSource="{Binding BandOptions}" SelectedItem="{Binding SelectedBands}" IsEnabled="{Binding BandsEnabled}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="BARS"/>
+                  <ToggleButton Style="{StaticResource RackSmallToggle}" Content="GLOW" IsChecked="{Binding Glow}"
+                                HorizontalAlignment="Left" Margin="0,0,0,2" ToolTip="Bloom around the bright parts"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="PEAKS"/>
+                  <ToggleButton Style="{StaticResource RackSmallToggle}" Content="PEAK HOLD" IsChecked="{Binding PeakHold}"
+                                HorizontalAlignment="Left" Margin="0,0,0,2"/>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+
+            <!-- METER WINDOWS -->
+            <Grid Grid.Column="6" Margin="14,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="21"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="33"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <TextBlock Grid.ColumnSpan="3" Style="{StaticResource RackHeader}" Margin="0" rack:RackProps.Engrave="METER WINDOWS"/>
+              <ToggleButton x:Name="LedButton" Grid.Row="2" Grid.Column="0" Style="{StaticResource RackSmallToggle}" Content="LED" ToolTip="Floating segmented LED spectrum analyzer"/>
+              <ToggleButton x:Name="VuButton" Grid.Row="2" Grid.Column="2" Style="{StaticResource RackSmallToggle}" Content="VU" ToolTip="Floating analog or digital VU / peak meter"/>
+              <ToggleButton x:Name="PhaseButton" Grid.Row="4" Grid.Column="0" Style="{StaticResource RackSmallToggle}" Content="PHASE" ToolTip="Floating goniometer and correlation meter"/>
+              <ToggleButton x:Name="LoudnessButton" Grid.Row="4" Grid.Column="2" Style="{StaticResource RackSmallToggle}" Content="LUFS" ToolTip="Floating EBU R128 loudness meter: LUFS, LRA, true peak"/>
+            </Grid>
+
+            <!-- GENERATOR -->
+            <DockPanel Grid.Column="8" Margin="14,0">
+              <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <TextBlock Style="{StaticResource RackHeader}" Margin="0" rack:RackProps.Engrave="GENERATOR"/>
+                <TextBlock Text="{Binding GenStatus}" Margin="12,0,0,0" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource RackAmberDim}"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                           ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+              </DockPanel>
+              <Grid VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="112"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="OUTPUT"/>
+                  <ComboBox ItemsSource="{Binding GenDevices}" SelectedItem="{Binding SelectedGenDevice}" Style="{StaticResource RackSelect}" ToolTip="Playback device for the test signal"/>
+                  <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="SIGNAL" Margin="0,12,0,5"/>
+                  <ComboBox ItemsSource="{Binding GenSignals}" SelectedItem="{Binding SelectedGenSignal}" Style="{StaticResource RackSelect}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                  <StackPanel Margin="6,0">
+                    <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="FREQ" HorizontalAlignment="Center"/>
+                    <rack:RackKnob x:Name="FreqKnob" Value="{Binding FrequencyKnob}" Width="56" Height="56" ToolTip="Frequency: drag up/down or scroll (Shift for fine steps)"/>
+                    <TextBox x:Name="GenFreqBox" Style="{StaticResource RackReadout}" Text="{Binding GenFrequencyText}" Margin="0,6,0,0"/>
+                  </StackPanel>
+                  <StackPanel Margin="6,0">
+                    <TextBlock Style="{StaticResource RackFieldLabel}" rack:RackProps.Engrave="LEVEL" HorizontalAlignment="Center"/>
+                    <rack:RackKnob x:Name="LevelKnob" Value="{Binding LevelKnob}" Width="56" Height="56" ToolTip="Level in dBFS: drag up/down or scroll (Shift for fine steps)"/>
+                    <TextBox x:Name="GenLevelBox" Style="{StaticResource RackReadout}" Text="{Binding GenLevelText}" Margin="0,6,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+                <ToggleButton Grid.Column="2" Style="{StaticResource RackSmallToggle}" Content="{Binding GeneratorButtonText}"
+                              Command="{Binding ToggleGeneratorCommand}" IsChecked="{Binding GeneratorPlaying, Mode=OneWay}"
+                              VerticalAlignment="Bottom" Margin="0,0,0,2" ToolTip="Play the test signal on the output device"/>
+              </Grid>
+            </DockPanel>
+
+            <!-- SPECTRUM -->
+            <StackPanel Grid.Column="10" Margin="14,0,0,0">
+              <TextBlock Style="{StaticResource RackHeader}" rack:RackProps.Engrave="SPECTRUM"/>
+              <ToggleButton Style="{StaticResource RackSmallToggle}" Content="FREEZE" IsChecked="{Binding Frozen}" ToolTip="Hold the spectrum on screen (Space)"/>
+              <Button Style="{StaticResource RackSmallButton}" Content="RESET" Command="{Binding ResetCommand}" Margin="0,12,0,0" ToolTip="Restart averaging and peak hold"/>
+              <Button Style="{StaticResource RackSmallButton}" Content="EXPORT CSV" Command="{Binding ExportCommand}" Margin="0,12,0,0" ToolTip="Save the spectrum on screen as CSV (Ctrl+S)"/>
+            </StackPanel>
+          </Grid>
+        </ContentControl>
+
+        <!-- The rack -->
+        <ContentControl x:Name="RackPanel" Style="{StaticResource RackPlate}" Height="300" Padding="26,30,26,22">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition x:Name="LeftColumn" Width="196"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition x:Name="MeterColumn" Width="560"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Title, power, input -->
+            <Canvas x:Name="LeftControls" Grid.Column="0">
+              <TextBlock Canvas.Left="8" Canvas.Top="4" Width="170" TextWrapping="Wrap" TextAlignment="Center"
+                         FontSize="22" FontWeight="Medium" LineHeight="26" LineStackingStrategy="BlockLineHeight"
+                         Foreground="#ECE7DE" Effect="{StaticResource RackEngraved}" Text="Audio Spectrum Analyzer"
+                         ToolTip="Double-click to dock the rack above the taskbar"/>
+              <Button x:Name="PowerButton" Canvas.Left="20" Canvas.Top="136" Width="50" Height="64" Cursor="Hand"
+                      FocusVisualStyle="{x:Null}" ToolTip="Power off (close nSpectrum)">
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Grid>
+                      <Border CornerRadius="10" Margin="-3" Background="#1A1816" BorderBrush="#12FFFFFF" BorderThickness="1">
+                        <Border.Effect><DropShadowEffect ShadowDepth="5" Direction="270" BlurRadius="8" Opacity="0.6"/></Border.Effect>
+                      </Border>
+                      <Border x:Name="cap" CornerRadius="8" BorderBrush="#070606" BorderThickness="1">
+                        <Border.Background>
+                          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#3B3835" Offset="0"/>
+                            <GradientStop Color="#1B1A19" Offset="1"/>
+                          </LinearGradientBrush>
+                        </Border.Background>
+                      </Border>
+                      <Border CornerRadius="7" Margin="1" BorderBrush="#26FFFFFF" BorderThickness="0,1,0,0"/>
+                      <Border x:Name="rocker" VerticalAlignment="Bottom" Height="28" Margin="6,0,6,6" CornerRadius="5" BorderBrush="Black" BorderThickness="0,0,0,1">
+                        <Border.Background>
+                          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#2C2A28" Offset="0"/>
+                            <GradientStop Color="#141312" Offset="1"/>
+                          </LinearGradientBrush>
+                        </Border.Background>
+                      </Border>
+                      <Ellipse Width="26" Height="26" VerticalAlignment="Top" Margin="0,4,0,0" Fill="#FFA21E" Opacity="0.55">
+                        <Ellipse.Effect><BlurEffect Radius="11"/></Ellipse.Effect>
+                      </Ellipse>
+                      <Ellipse Width="14" Height="14" VerticalAlignment="Top" Margin="0,10,0,0">
+                        <Ellipse.Fill>
+                          <RadialGradientBrush GradientOrigin="0.45,0.4" Center="0.45,0.4">
+                            <GradientStop Color="#FFF6CF" Offset="0"/>
+                            <GradientStop Color="#FFC23D" Offset="0.35"/>
+                            <GradientStop Color="#E07000" Offset="0.75"/>
+                            <GradientStop Color="#7A3500" Offset="1"/>
+                          </RadialGradientBrush>
+                        </Ellipse.Fill>
+                      </Ellipse>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsPressed" Value="True">
+                        <Setter TargetName="rocker" Property="Margin" Value="6,0,6,5"/>
+                        <Setter TargetName="cap" Property="Opacity" Value="0.85"/>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Button.Template>
+              </Button>
+              <TextBlock Canvas.Left="5" Canvas.Top="220" Width="80" Style="{StaticResource RackLegend}" Text="POWER"/>
+              <rack:RackKnob x:Name="InputKnob" Canvas.Left="88" Canvas.Top="116" Width="100" Height="100" ShowScale="True"
+                             ToolTip="INPUT: turn to choose the source"/>
+              <TextBlock Canvas.Left="98" Canvas.Top="220" Width="80" Style="{StaticResource RackLegend}" Text="INPUT"/>
+            </Canvas>
+
+            <!-- Spectrum screen. WPF cannot draw over the Direct3D surface, so the labels sit around it on the same dark glass. -->
+            <Border x:Name="ScreenBezel" Grid.Column="1" Margin="6,0,18,0" CornerRadius="16" Padding="8" BorderBrush="#0A0908" BorderThickness="2">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                  <GradientStop Color="#1A1817" Offset="0"/>
+                  <GradientStop Color="#272422" Offset="1"/>
+                </LinearGradientBrush>
+              </Border.Background>
+              <Border x:Name="Screen" CornerRadius="10" BorderBrush="Black" BorderThickness="1" ClipToBounds="True">
+                <Border.Background>
+                  <RadialGradientBrush Center="0.5,0.35" GradientOrigin="0.5,0.35" RadiusX="0.7" RadiusY="0.9">
+                    <GradientStop Color="#0B110E" Offset="0"/>
+                    <GradientStop Color="#070A09" Offset="0.7"/>
+                    <GradientStop Color="#040605" Offset="1"/>
+                  </RadialGradientBrush>
+                </Border.Background>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="DbColumn" Width="66"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="26"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition x:Name="StatusRow" Height="42"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition x:Name="FreqRow" Height="36"/>
+                  </Grid.RowDefinitions>
+                  <TextBlock x:Name="UnitText" Text="{Binding UnitLabel}" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,12,6"
+                             FontSize="15" FontWeight="SemiBold" Foreground="#E9D9A4"/>
+                  <DockPanel x:Name="StatusLine" Grid.Row="0" Grid.Column="1" Margin="10,0,6,8" VerticalAlignment="Bottom" LastChildFill="False">
+                    <TextBlock Text="{Binding StatusText}" ToolTip="{Binding StatusToolTip}" DockPanel.Dock="Right" FontSize="13" FontWeight="SemiBold" Foreground="#FFB238" Opacity="0.85"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding ToneText}" ToolTip="{Binding ToneToolTip}" DockPanel.Dock="Left" FontSize="13" FontWeight="SemiBold" Foreground="#FFB238" Opacity="0.6" Margin="0,0,18,0"/>
+                    <TextBlock Text="{Binding DistortionText}" ToolTip="{Binding DistortionToolTip}" DockPanel.Dock="Left" FontSize="13" FontWeight="SemiBold" Foreground="#FFB238" Opacity="0.6"/>
+                  </DockPanel>
+                  <Canvas x:Name="DbAxis" Grid.Row="1" Grid.Column="0" ClipToBounds="False"/>
+                  <ns:SpectrumView x:Name="View" Grid.Row="1" Grid.Column="1"/>
+                  <Canvas x:Name="FreqAxis" Grid.Row="2" Grid.Column="1" ClipToBounds="False"/>
+                  <TextBlock x:Name="ErrorText" Grid.Row="1" Grid.Column="1" Foreground="#FF7A7A" FontSize="14" FontWeight="SemiBold"
+                             TextWrapping="Wrap" Margin="20" Visibility="Collapsed"/>
+                </Grid>
+              </Border>
+            </Border>
+
+            <!-- VU meters and the front buttons -->
+            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+              <Grid x:Name="VuMeters" Height="160">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="12"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" CornerRadius="10" Padding="7" BorderBrush="#0A0908" BorderThickness="2">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                      <GradientStop Color="#1B1918" Offset="0"/>
+                      <GradientStop Color="#2B2826" Offset="1"/>
+                    </LinearGradientBrush>
+                  </Border.Background>
+                  <rack:RackVuMeter x:Name="VuLeft" Channel="L"/>
+                </Border>
+                <Border Grid.Column="2" CornerRadius="10" Padding="7" BorderBrush="#0A0908" BorderThickness="2">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                      <GradientStop Color="#1B1918" Offset="0"/>
+                      <GradientStop Color="#2B2826" Offset="1"/>
+                    </LinearGradientBrush>
+                  </Border.Background>
+                  <rack:RackVuMeter x:Name="VuRight" Channel="R"/>
+                </Border>
+              </Grid>
+              <DockPanel x:Name="FrontButtons" Margin="16,28,0,0" LastChildFill="False">
+                <Button Style="{StaticResource RackButton}" Content="SPEC" rack:RackProps.Lit="True" Margin="0,0,10,0"
+                        Command="{Binding NextLookCommand}" ToolTip="{Binding LookToolTip}"/>
+                <Button Style="{StaticResource RackButton}" Content="{Binding BandsLabel}" Command="{Binding NextBandsCommand}" Margin="0,0,12,0"
+                        ToolTip="Band width of the LED looks: click for the next one"/>
+                <ToggleButton Style="{StaticResource RackToggle}" Content="PEAK" Margin="0,0,12,0"
+                              IsChecked="{Binding PeakHold}" ToolTip="Peak hold"/>
+                <ToggleButton Style="{StaticResource RackToggle}" Content="RMS" IsChecked="{Binding RmsReading}"
+                              ToolTip="Reading: lit = noise per bin (RMS power), dark = tone level"/>
+                <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding OptionsOpen}" Style="{StaticResource RackToggle}" MinWidth="58" Padding="0"
+                              ToolTip="Show or hide the options panel">
+                  <Path Width="24" Height="24" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=rack:RackChrome}}"
+                        Data="M9.74,4.53 L10.02,1.69 L13.98,1.69 L14.26,4.53 L15.68,5.12 L17.89,3.31 L20.69,6.11 L18.88,8.32 L19.47,9.74 L22.31,10.02 L22.31,13.98 L19.47,14.26 L18.88,15.68 L20.69,17.89 L17.89,20.69 L15.68,18.88 L14.26,19.47 L13.98,22.31 L10.02,22.31 L9.74,19.47 L8.32,18.88 L6.11,20.69 L3.31,17.89 L5.12,15.68 L4.53,14.26 L1.69,13.98 L1.69,10.02 L4.53,9.74 L5.12,8.32 L3.31,6.11 L6.11,3.31 L8.32,5.12 Z M15.6,12 A3.6,3.6 0 1 1 8.4,12 A3.6,3.6 0 1 1 15.6,12 Z"/>
+                </ToggleButton>
+                <Button x:Name="MiniButton" DockPanel.Dock="Right" Style="{StaticResource RackButton}" Content="MINI" Margin="0,0,10,0"
+                        ToolTip="Mini rack: a slim strip with the spectrum across"/>
+              </DockPanel>
+            </StackPanel>
+
+            <!-- Mini rack controls: options, back to the full rack, power -->
+            <StackPanel x:Name="MiniButtons" Grid.Column="3" VerticalAlignment="Center" Margin="14,0,0,0" Visibility="Collapsed">
+              <ToggleButton IsChecked="{Binding OptionsOpen}" Style="{StaticResource RackSmallToggle}" Width="46" Padding="0"
+                            ToolTip="Show or hide the options panel">
+                <Path Width="18" Height="18" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=rack:RackChrome}}"
+                      Data="M9.74,4.53 L10.02,1.69 L13.98,1.69 L14.26,4.53 L15.68,5.12 L17.89,3.31 L20.69,6.11 L18.88,8.32 L19.47,9.74 L22.31,10.02 L22.31,13.98 L19.47,14.26 L18.88,15.68 L20.69,17.89 L17.89,20.69 L15.68,18.88 L14.26,19.47 L13.98,22.31 L10.02,22.31 L9.74,19.47 L8.32,18.88 L6.11,20.69 L3.31,17.89 L5.12,15.68 L4.53,14.26 L1.69,13.98 L1.69,10.02 L4.53,9.74 L5.12,8.32 L3.31,6.11 L6.11,3.31 L8.32,5.12 Z M15.6,12 A3.6,3.6 0 1 1 8.4,12 A3.6,3.6 0 1 1 15.6,12 Z"/>
+              </ToggleButton>
+              <Button x:Name="FullButton" Style="{StaticResource RackSmallButton}" Width="46" Padding="0" Margin="0,10,0,0" Content="FULL"
+                      FontSize="11" ToolTip="Back to the full rack"/>
+              <Button x:Name="MiniPowerButton" Style="{StaticResource RackSmallButton}" Width="46" Padding="0" Margin="0,10,0,0" Content="⏻"
+                      FontSize="16" ToolTip="Power off (close nSpectrum)"/>
+            </StackPanel>
+          </Grid>
+        </ContentControl>
+      </StackPanel>
+    </Grid>
+  </rack:ScaleToWidth>
+</Window>

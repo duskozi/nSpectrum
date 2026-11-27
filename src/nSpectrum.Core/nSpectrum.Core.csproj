@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>nSpectrum.Core</RootNamespace>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsPackable>true</IsPackable>
+    <PackageId>nSpectrum.Core</PackageId>
+    <Description>Real-time, allocation-free audio spectrum analysis engine: real FFT, analysis windows with explicit correction, averaging, peak hold and dBFS scaling.</Description>
+    <PackageTags>audio;spectrum;fft;analyzer;dsp;rta</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Tensors" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="nSpectrum.Core.Tests" />
+  </ItemGroup>
+</Project>
