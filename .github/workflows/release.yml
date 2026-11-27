@@ -46,12 +46,20 @@ jobs:
           Compress-Archive -Path out/nSpectrum/* -DestinationPath "nSpectrum-$v-win-x64.zip"
           Compress-Archive -Path out/nSpectrum-standalone/* -DestinationPath "nSpectrum-$v-win-x64-standalone.zip"
 
-      - name: Create the GitHub release
+      - name: Create the GitHub release (or add the zips to an existing one)
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = '${{ steps.ver.outputs.tag }}'
           $v = '${{ steps.ver.outputs.version }}'
-          $pre = if ($v -match '-') { '--prerelease' } else { '' }
-          gh release create $tag "nSpectrum-$v-win-x64.zip" "nSpectrum-$v-win-x64-standalone.zip" --title "nSpectrum $v" --generate-notes --target ${{ github.sha }} $pre
+          $files = @("nSpectrum-$v-win-x64.zip", "nSpectrum-$v-win-x64-standalone.zip")
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            # Made by hand on github.com first: just attach the zips (replacing any with the same name).
+            gh release upload $tag @files --clobber
+          } else {
+            $options = @('--title', "nSpectrum $v", '--generate-notes', '--target', '${{ github.sha }}')
+            if ($v -match '-') { $options += '--prerelease' }
+            gh release create $tag @files @options
+          }
