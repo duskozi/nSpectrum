@@ -6,6 +6,8 @@ walnut cheeks, brushed metal, amber VU meters and an LED spectrum.
 I wanted something that looks nice sitting above the taskbar while music plays, but still
 measures properly when I need it to.
 
+![nSpectrum with the LED meter on top](docs/nspectrum-normal.gif)
+
 ## What it does
 
 - Spectrum of whatever you hear (WASAPI loopback), a microphone or line input
@@ -18,6 +20,16 @@ measures properly when I need it to.
 - Mini mode when the full rack takes too much space
 - Every setting is also in the right-click menu
 - Export the spectrum on screen to CSV
+
+## Screenshots
+
+Full rack with the options panel open:
+
+![Options panel](docs/nspectrum-options.png)
+
+Mini mode, when the full rack takes too much space. The LED meter can sit on top at full width:
+
+![Mini rack](docs/nspectrum-mini.gif)
 
 ## Download
 
